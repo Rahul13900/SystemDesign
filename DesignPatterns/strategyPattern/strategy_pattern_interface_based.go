@@ -2,43 +2,41 @@ package main
 
 import "fmt"
 
-// Strategy interface
-type DriveStrategy interface {
-	Drive()
+type IDBConnection interface {
+	Connect()
 }
 
-// Concrete strategies
-type NormalDrive struct{}
-func (n *NormalDrive) Drive() { fmt.Println("Driving on regular roads") }
-
-type OffroadDrive struct{}
-func (o *OffroadDrive) Drive() { fmt.Println("Driving on rough off-road terrain") }
-
-type SportsDrive struct{}
-func (s *SportsDrive) Drive() { fmt.Println("Driving at high speed with agility") }
-
-// Vehicle uses strategy
-type Vehicle struct {
-	driveStrategy DriveStrategy
+type DBConnection struct {
+	DB IDBConnection
 }
 
-func (v *Vehicle) SetDriveStrategy(ds DriveStrategy) {
-	v.driveStrategy = ds
+func (d DBConnection) DBConnect() {
+	d.DB.Connect()
 }
 
-func (v *Vehicle) Drive() {
-	v.driveStrategy.Drive()
+type PostgreSQLConn struct {
+	ConnectionString string
+}
+
+func (p PostgreSQLConn) Connect() {
+	fmt.Println("PostgreSQL", p.ConnectionString)
+}
+
+type MongoDBConn struct {
+	ConnectionString string
+}
+
+func (m MongoDBConn) Connect() {
+	fmt.Println("MongoDB ", m.ConnectionString)
 }
 
 func main() {
-	v := &Vehicle{}
+	postgres := &PostgreSQLConn{ConnectionString: "Conected to PostgreSQL"}
+	conn := &DBConnection{DB: postgres}
+	conn.DB.Connect()
 
-	v.SetDriveStrategy(&NormalDrive{})
-	v.Drive()
+	mongodb := &MongoDBConn{ConnectionString: "Connected to MongoDB"}
+	conn = &DBConnection{DB: mongodb}
+	conn.DB.Connect()
 
-	v.SetDriveStrategy(&OffroadDrive{})
-	v.Drive()
-
-	v.SetDriveStrategy(&SportsDrive{})
-	v.Drive()
 }
