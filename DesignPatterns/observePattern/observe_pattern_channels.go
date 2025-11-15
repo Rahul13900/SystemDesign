@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
 ////////////////////////////
@@ -39,26 +38,26 @@ func (o *ObserverChannel) Listen() {
 // Subject (OrderService)
 ////////////////////////////
 
-type OrderService struct {
-	OrderID    string
-	Status     string
+type OrderServices struct {
+	OrderID     string
+	Status      string
 	Subscribers []*ObserverChannel
 }
 
 // Register adds an observer to the list.
-func (o *OrderService) Register(observer *ObserverChannel) {
+func (o *OrderServices) Register(observer *ObserverChannel) {
 	o.Subscribers = append(o.Subscribers, observer)
 }
 
 // NotifyAll pushes the new status to all observers via their channels.
-func (o *OrderService) NotifyAll() {
+func (o *OrderServices) NotifyAll() {
 	for _, obs := range o.Subscribers {
 		obs.Channel <- Notification{OrderID: o.OrderID, Status: o.Status}
 	}
 }
 
 // UpdateStatus sets the status and notifies all observers.
-func (o *OrderService) UpdateStatus(status string) {
+func (o *OrderServices) UpdateStatus(status string) {
 	o.Status = status
 	fmt.Println("\nOrder status updated to:", status)
 	o.NotifyAll()
@@ -68,44 +67,44 @@ func (o *OrderService) UpdateStatus(status string) {
 // Main
 ////////////////////////////
 
-func main() {
-	// Initialize the order service
-	order := &OrderService{OrderID: "ORD987"}
+// func main() {
+// 	// Initialize the order service
+// 	order := &OrderServices{OrderID: "ORD987"}
 
-	// Create observer instances with their own channels
-	emailObserver := &ObserverChannel{
-		Name:    "📧 EmailNotifier",
-		Channel: make(chan Notification),
-		Done:    make(chan bool),
-	}
-	smsObserver := &ObserverChannel{
-		Name:    "📱 SMSNotifier",
-		Channel: make(chan Notification),
-		Done:    make(chan bool),
-	}
+// 	// Create observer instances with their own channels
+// 	emailObserver := &ObserverChannel{
+// 		Name:    "EmailNotifier",
+// 		Channel: make(chan Notification),
+// 		Done:    make(chan bool),
+// 	}
+// 	smsObserver := &ObserverChannel{
+// 		Name:    "📱 SMSNotifier",
+// 		Channel: make(chan Notification),
+// 		Done:    make(chan bool),
+// 	}
 
-	// Register the observers
-	order.Register(emailObserver)
-	order.Register(smsObserver)
+// 	// Register the observers
+// 	order.Register(emailObserver)
+// 	order.Register(smsObserver)
 
-	// Start observers in separate goroutines
-	go emailObserver.Listen()
-	go smsObserver.Listen()
+// 	// Start observers in separate goroutines
+// 	go emailObserver.Listen()
+// 	go smsObserver.Listen()
 
-	// Simulate status updates
-	order.UpdateStatus("Order Placed")
-	time.Sleep(time.Millisecond * 500)
+// 	// Simulate status updates
+// 	order.UpdateStatus("Order Placed")
+// 	time.Sleep(time.Millisecond * 500)
 
-	order.UpdateStatus("Dispatched")
-	time.Sleep(time.Millisecond * 500)
+// 	order.UpdateStatus("Dispatched")
+// 	time.Sleep(time.Millisecond * 500)
 
-	order.UpdateStatus("Delivered")
-	time.Sleep(time.Millisecond * 500)
+// 	order.UpdateStatus("Delivered")
+// 	time.Sleep(time.Millisecond * 500)
 
-	// Gracefully stop the observers
-	emailObserver.Done <- true
-	smsObserver.Done <- true
+// 	// Gracefully stop the observers
+// 	emailObserver.Done <- true
+// 	smsObserver.Done <- true
 
-	// Wait to let goroutines print shutdown message
-	time.Sleep(time.Millisecond * 200)
-}
+// 	// Wait to let goroutines print shutdown message
+// 	time.Sleep(time.Millisecond * 200)
+// }
